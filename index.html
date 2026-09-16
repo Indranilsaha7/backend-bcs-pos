@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07090d">
+    <meta name="description" content="Baroda Computer and Sales — Your technology destination. Coming soon.">
+
+    <title>Baroda Computer & Sales — Coming Soon</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --bg: #06080c;
+            --bg-2: #0b0e14;
+
+            --white: #ffffff;
+            --text: #e8ebf0;
+            --muted: #858b98;
+
+            --blue: #1683ff;
+            --cyan: #00d9ff;
+            --purple: #6d4aff;
+
+            --glass: rgba(255,255,255,.045);
+            --border: rgba(255,255,255,.09);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Updated for better mobile overflow handling */
+            min-height: 100dvh; 
+            overflow-x: hidden;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--white);
+
+            background:
+                radial-gradient(
+                    circle at 50% 30%,
+                    rgba(22,131,255,.12),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 90% 100%,
+                    rgba(109,74,255,.08),
+                    transparent 30%
+                ),
+                var(--bg);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px; /* Safe space for smaller viewports */
+        }
+
+        /* =====================================
+           BACKGROUND
+        ====================================== */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 10%, transparent 78%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 78%);
+        }
+
+        .glow {
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .15;
+            animation: float 12s ease-in-out infinite alternate;
+            will-change: transform; /* Performance fix */
+        }
+
+        .glow-1 {
+            left: -300px;
+            top: -250px;
+            background: var(--blue);
+        }
+
+        .glow-2 {
+            right: -280px;
+            bottom: -300px;
+            background: var(--purple);
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            from { transform: translate3d(0, 0, 0) scale(1); }
+            to { transform: translate3d(40px, -30px, 0) scale(1.08); }
+        }
+
+        /* =====================================
+           MAIN
+        ====================================== */
+
+        .wrapper {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 980px; /* Changed from min() for better stability */
+            padding: 55px;
+            border-radius: 30px;
+
+            background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+            border: 1px solid var(--border);
+
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+
+            box-shadow: 0 40px 120px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.05);
+            animation: entrance .9s cubic-bezier(.2,.8,.2,1);
+        }
+
+        @keyframes entrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px) scale(.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =====================================
+           HEADER
+        ====================================== */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 70px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            box-shadow: 0 10px 30px rgba(22,131,255,.25);
+        }
+
+        .brand-icon span {
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: -.08em;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -.02em;
+        }
+
+        .brand-sub {
+            margin-top: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .domain {
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.08);
+            background: rgba(255,255,255,.035);
+            color: #9ca2ae;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* =====================================
+           HERO
+        ====================================== */
+
+        .hero {
+            max-width: 850px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: rgba(22,131,255,.06);
+            border: 1px solid rgba(22,131,255,.15);
+            color: #9ecbff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2d9cff;
+            box-shadow: 0 0 10px #1683ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .45; transform: scale(.75); }
+        }
+
+        h1 {
+            max-width: 850px;
+            font-size: clamp(2.5rem, 8vw, 7rem); /* Adjusted minimum scale */
+            line-height: .94;
+            letter-spacing: -.07em;
+            font-weight: 900;
+            margin-bottom: 28px;
+        }
+
+        h1 .gradient {
+            background: linear-gradient(100deg, #ffffff 10%, #ffffff 42%, #66b7ff 68%, #7881ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .headline {
+            max-width: 690px;
+            font-size: clamp(1.15rem, 2vw, 1.45rem);
+            line-height: 1.6;
+            color: var(--text);
+            margin-bottom: 15px;
+        }
+
+        .description {
+            max-width: 650px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* =====================================
+           FEATURE STRIP
+        ====================================== */
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 35px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 13px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.035);
+            border: 1px solid rgba(255,255,255,.065);
+            color: #9ea4af;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .feature-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+            box-shadow: 0 0 8px var(--blue);
+        }
+
+        /* =====================================
+           BOTTOM
+        ====================================== */
+
+        .bottom {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .message {
+            font-size: 13px;
+            color: #777d88;
+        }
+
+        .message strong {
+            color: #c8ccd4;
+            font-weight: 600;
+        }
+
+        .url {
+            color: #737985;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        /* =====================================
+           CORNERS
+        ====================================== */
+
+        .corner {
+            position: absolute;
+            width: 65px;
+            height: 65px;
+            opacity: .3;
+        }
+
+        .corner::before,
+        .corner::after {
+            content: "";
+            position: absolute;
+            background: linear-gradient(90deg, var(--blue), transparent);
+        }
+
+        .corner::before {
+            width: 65px;
+            height: 1px;
+            top: 0;
+            left: 0;
+        }
+
+        .corner::after {
+            width: 1px;
+            height: 65px;
+            top: 0;
+            left: 0;
+        }
+
+        .top-left {
+            top: 0;
+            left: 0;
+        }
+
+        .bottom-right {
+            right: 0;
+            bottom: 0;
+            transform: rotate(180deg);
+        }
+
+        /* =====================================
+           MOBILE
+        ====================================== */
+
+        @media (max-width: 700px) {
+            body {
+                /* Safe alignment for small screens */
+                align-items: flex-start;
+                padding-top: 40px; 
+                padding-bottom: 40px;
+            }
+
+            .wrapper {
+                padding: 35px 25px;
+                border-radius: 22px;
+            }
+
+            .header {
+                margin-bottom: 55px;
+            }
+
+            .domain {
+                display: none;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 13vw, 5rem);
+            }
+
+            .headline {
+                font-size: 1.1rem;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .features {
+                gap: 7px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background">
+        <div class="grid"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <main class="wrapper">
+
+        <div class="corner top-left"></div>
+        <div class="corner bottom-right"></div>
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <span>BCS</span>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">
+                        Baroda Computer & Sales
+                    </div>
+                    <div class="brand-sub">
+                        Technology • Hardware • Solutions
+                    </div>
+                </div>
+            </div>
+            <div class="domain">
+                bcs.bcsdeveloper.com
+            </div>
+        </header>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="status">
+                <span class="status-dot"></span>
+                New store experience in development
+            </div>
+
+            <h1>
+                Your next
+                <span class="gradient">
+                    technology destination.
+                </span>
+            </h1>
+
+            <p class="headline">
+                Baroda Computer and Sales is preparing something new.
+            </p>
+
+            <p class="description">
+                Our new online experience is currently being built.
+                Soon you'll be able to explore our products, services solutions
+                from one place.
+            </p>
+
+            <!-- FEATURES -->
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon"></span>
+                    Coming Online Soon
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTTOM -->
+        <footer class="bottom">
+            <div class="message">
+                <strong>Something better is being built.</strong>
+                Stay tuned.
+            </div>
+            <div class="url">
+                bcs.bcsdeveloper.com
+            </div>
+        </footer>
+
+    </main>
+
+</body>
+</html>
