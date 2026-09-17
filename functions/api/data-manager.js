@@ -3,7 +3,7 @@ const ALLOWED_ORIGIN = 'https://bcs.bcsdeveloper.com';
 const corsHeaders = {
   'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-api-key',
+  'Access-Control-Allow-Headers': 'Content-Type, x-api-key, x-user-id, x-security-code',
   'Access-Control-Max-Age': '86400',
 };
 
@@ -16,7 +16,7 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // 2. API Key Security
+  // 2. API Key Security (App Layer)
   const apiKey = request.headers.get('x-api-key');
   if (!apiKey || apiKey !== env.API_KEY) {
     return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
@@ -27,6 +27,46 @@ export async function onRequest(context) {
 
   try {
     const url = new URL(request.url);
+
+    // 2.5 User Identity & RBAC Security Layer (for mutations)
+    if (['POST', 'PUT', 'DELETE'].includes(method)) {
+      const userId = request.headers.get('x-user-id');
+      const securityCode = request.headers.get('x-security-code');
+      
+      if (!userId || !securityCode) {
+        return new Response(JSON.stringify({ success: false, error: 'Missing identity headers (x-user-id, x-security-code)' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      const authStmt = env.DB.prepare('SELECT role, permissions FROM users WHERE id = ? AND security_code = ?').bind(userId, securityCode);
+      const authUser = await authStmt.first();
+      
+      if (!authUser) {
+        return new Response(JSON.stringify({ success: false, error: 'Forbidden: Invalid user or security code' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      if (authUser.role !== 'admin') {
+        let perms = [];
+        try { perms = JSON.parse(authUser.permissions || '[]'); } catch(e) {}
+        
+        let requiredPerm = '';
+        if (method === 'POST') requiredPerm = 'add_product';
+        if (method === 'PUT') requiredPerm = 'edit_product';
+        if (method === 'DELETE') requiredPerm = 'delete_product';
+        
+        if (!perms.includes(requiredPerm)) {
+          return new Response(JSON.stringify({ success: false, error: 'Forbidden: Missing permission ' + requiredPerm }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+    }
 
     // Helper to safely parse numbers
     const safeNumber = (val) => {

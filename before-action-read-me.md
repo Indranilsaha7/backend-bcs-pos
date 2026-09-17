@@ -5,7 +5,7 @@
 * **Database:** Cloudflare D1 (Relational SQLite). 
 * **Rule:** WE DO NOT USE FIREBASE ANYMORE. Do NOT write or suggest any Firebase SDK code.
 * **Routing:** All API endpoints exist inside the `./functions/api/` folder.
-
+* **backend url:** https://backend.bcs.bcsdeveloper.com
 ## 2. Security & Authentication Strict Rules
 * **API Key Protection:** Every single endpoint MUST verify the `x-api-key` header.
 * If `request.headers.get('x-api-key') !== context.env.API_KEY`, immediately return a `401 Unauthorized` JSON response.
