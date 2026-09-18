@@ -52,14 +52,21 @@ export async function onRequest(context) {
            return `"${k}" TEXT`;
         });
         
-        // If 'id' wasn't in the keys, make sure we have a primary key?
-        // Actually, 'id' is guaranteed by our upload script.
         const createQuery = `CREATE TABLE IF NOT EXISTS "${table}" (${columnDefs.join(', ')});`;
-        
+        await env.DB.prepare(createQuery).run();
+
+        // Schema Evolution: Add missing columns
         try {
-           await env.DB.prepare(createQuery).run();
+            const { results } = await env.DB.prepare(`PRAGMA table_info("${table}")`).all();
+            const existingColumns = results.map(r => r.name);
+            
+            for (const key of keys) {
+                if (!existingColumns.includes(key)) {
+                    await env.DB.prepare(`ALTER TABLE "${table}" ADD COLUMN "${key}" TEXT`).run();
+                }
+            }
         } catch(e) {
-           console.error("Table create error (might exist):", e);
+            console.error("Schema evolution error:", e);
         }
     }
 
@@ -75,7 +82,8 @@ export async function onRequest(context) {
     const columns = keys.map(k => `"${k}"`).join(', ');
     const placeholders = keys.map(() => '?').join(', ');
 
-    const query = `INSERT INTO "${table}" (${columns}) VALUES (${placeholders})`;
+    // Use INSERT OR REPLACE to handle re-runs gracefully
+    const query = `INSERT OR REPLACE INTO "${table}" (${columns}) VALUES (${placeholders})`;
 
     // Use binding for SQL injection protection
     const stmt = env.DB.prepare(query).bind(...values);
