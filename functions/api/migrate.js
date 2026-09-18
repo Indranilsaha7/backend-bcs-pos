@@ -2,7 +2,7 @@ const ALLOWED_ORIGIN = '*'; // Migration script can run from anywhere
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, x-api-key',
   'Access-Control-Max-Age': '86400',
 };
@@ -22,6 +22,21 @@ export async function onRequest(context) {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
+  }
+
+  if (method === 'GET') {
+    try {
+      const url = new URL(request.url);
+      const table = url.searchParams.get('table');
+      if (!table) {
+        return new Response(JSON.stringify({ success: false, error: 'Missing table param' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const { results } = await env.DB.prepare(`SELECT id FROM "${table}"`).all();
+      return new Response(JSON.stringify({ success: true, ids: results.map(r => r.id) }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    } catch(e) {
+      // Table might not exist yet, so return empty array
+      return new Response(JSON.stringify({ success: true, ids: [] }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
   }
 
   if (method !== 'POST') {
