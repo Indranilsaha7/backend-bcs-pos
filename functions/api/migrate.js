@@ -53,20 +53,17 @@ export async function onRequest(context) {
         });
         
         const createQuery = `CREATE TABLE IF NOT EXISTS "${table}" (${columnDefs.join(', ')});`;
-        await env.DB.prepare(createQuery).run();
+        try { await env.DB.prepare(createQuery).run(); } catch(e) {}
 
-        // Schema Evolution: Add missing columns
-        try {
-            const { results } = await env.DB.prepare(`PRAGMA table_info("${table}")`).all();
-            const existingColumns = results.map(r => r.name);
-            
-            for (const key of keys) {
-                if (!existingColumns.includes(key)) {
-                    await env.DB.prepare(`ALTER TABLE "${table}" ADD COLUMN "${key}" TEXT`).run();
-                }
+        // Schema Evolution: Add missing columns individually
+        for (const key of keys) {
+            try {
+                // Using IF NOT EXISTS is not supported for ALTER TABLE ADD COLUMN in sqlite
+                // So we just blindly attempt to add the column, and ignore the error if it already exists
+                await env.DB.prepare(`ALTER TABLE "${table}" ADD COLUMN "${key}" TEXT`).run();
+            } catch (e) {
+                // Ignore errors (usually means column already exists)
             }
-        } catch(e) {
-            console.error("Schema evolution error:", e);
         }
     }
 
