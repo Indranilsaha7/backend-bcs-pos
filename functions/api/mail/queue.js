@@ -64,7 +64,7 @@ export async function onRequest(context) {
 
     const emailContent = [
       `To: ${to}`,
-      `From: ${encodeHeader('BCSdevloper™ Support')} <${env.GMAIL_USER}>`,
+      `From: ${encodeHeader('BCSdevloper Support')} <${env.GMAIL_USER}>`,
       `Reply-To: support@bcs.bcsdeveloper.com`,
       `Subject: ${encodeHeader(subject)}`,
       `Content-Type: text/html; charset=utf-8`,
