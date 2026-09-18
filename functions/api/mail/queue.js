@@ -59,11 +59,14 @@ export async function onRequest(context) {
       }), { status: 400, headers: corsHeaders });
     }
 
+    // Helper function to safely encode UTF-8 headers
+    const encodeHeader = (str) => `=?utf-8?B?${btoa(unescape(encodeURIComponent(str)))}?=`;
+
     const emailContent = [
       `To: ${to}`,
-      `From: "BCSdevloper™ Support" <${env.GMAIL_USER}>`,
+      `From: ${encodeHeader('BCSdevloper™ Support')} <${env.GMAIL_USER}>`,
       `Reply-To: support@bcs.bcsdeveloper.com`,
-      `Subject: ${subject}`,
+      `Subject: ${encodeHeader(subject)}`,
       `Content-Type: text/html; charset=utf-8`,
       '',
       htmlBody
