@@ -43,19 +43,41 @@ export async function onRequest(context) {
       });
     }
 
-    // Dynamic insert generation
     const keys = Object.keys(data);
-    const values = Object.values(data);
     
-    // To handle sqlite keywords properly, wrap column names in double quotes or backticks if necessary, 
-    // but assuming standard alphanumeric names here.
-    const columns = keys.join(', ');
+    // Auto-Create Table if not exists based on the payload (Treat everything as TEXT in SQLite)
+    if (body.action === 'create_table' || body.action === 'insert_record') {
+        const columnDefs = keys.map(k => {
+           if (k === 'id') return `"${k}" TEXT PRIMARY KEY`;
+           return `"${k}" TEXT`;
+        });
+        
+        // If 'id' wasn't in the keys, make sure we have a primary key?
+        // Actually, 'id' is guaranteed by our upload script.
+        const createQuery = `CREATE TABLE IF NOT EXISTS "${table}" (${columnDefs.join(', ')});`;
+        
+        try {
+           await env.DB.prepare(createQuery).run();
+        } catch(e) {
+           console.error("Table create error (might exist):", e);
+        }
+    }
+
+    // Dynamic insert generation
+    // Stringify objects/arrays because D1 doesn't accept them natively in prepared statements
+    const values = Object.values(data).map(val => {
+        if (val !== null && typeof val === 'object') {
+            return JSON.stringify(val);
+        }
+        return val;
+    });
+    
+    const columns = keys.map(k => `"${k}"`).join(', ');
     const placeholders = keys.map(() => '?').join(', ');
 
-    const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders})`;
+    const query = `INSERT INTO "${table}" (${columns}) VALUES (${placeholders})`;
 
-    // Using env.DB.prepare().bind() properly handles sqlite types.
-    // However, D1 bind() requires an array of values if dynamically spreading.
+    // Use binding for SQL injection protection
     const stmt = env.DB.prepare(query).bind(...values);
     
     await stmt.run();
