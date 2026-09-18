@@ -52,7 +52,11 @@ export async function onRequest(context) {
 
     const tokenData = await tokenResponse.json();
     if (!tokenData.access_token) {
-      throw new Error('Failed to authenticate with Google Server');
+      // This will print Google's exact error in Postman
+      return new Response(JSON.stringify({ 
+        error: 'Google Token Error', 
+        details: tokenData 
+      }), { status: 400, headers: corsHeaders });
     }
 
     const emailContent = [
