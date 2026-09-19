@@ -79,9 +79,16 @@ export async function onRequest(context) {
       const limit = Number(url.searchParams.get('limit')) || 100;
       const offset = Number(url.searchParams.get('offset')) || 0;
       
-      const stmt = env.DB.prepare('SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?').bind(limit, offset);
-      const { results } = await stmt.all();
-      return new Response(JSON.stringify({ success: true, data: results }), {
+      const countStmt = env.DB.prepare('SELECT COUNT(*) as total FROM products');
+      const dataStmt = env.DB.prepare('SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?').bind(limit, offset);
+      
+      const [countResult, dataResult] = await env.DB.batch([countStmt, dataStmt]);
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        total_count: countResult.results[0].total,
+        data: dataResult.results 
+      }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
